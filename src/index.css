@@ -1,0 +1,119 @@
+@import 'react-toastify/dist/ReactToastify.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #0F0F1E;
+  color: #ffffff;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(26, 26, 46, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 217, 255, 0.5);
+}
+
+/* Canvas grid pattern */
+.canvas-grid {
+  background-image: radial-gradient(circle, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Neon glow utilities */
+.glow-primary {
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+}
+
+.glow-primary-intense {
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.6), 0 0 40px rgba(0, 217, 255, 0.3);
+}
+
+.glow-secondary {
+  box-shadow: 0 0 10px rgba(123, 97, 255, 0.3);
+}
+
+.glow-accent {
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+/* Glass morphism effect */
+.glass {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(26, 26, 46, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Toast container overrides */
+.Toastify__toast-container {
+  width: 320px;
+}
+
+.Toastify__toast {
+  background: rgba(26, 26, 46, 0.95);
+  color: #ffffff;
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.Toastify__toast--success {
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.Toastify__toast--error {
+  border-color: rgba(255, 51, 102, 0.3);
+}
+
+.Toastify__toast--warning {
+  border-color: rgba(255, 184, 0, 0.3);
+}
+
+.Toastify__progress-bar {
+  background: linear-gradient(90deg, #00D9FF, #7B61FF);
+}
+
+/* Selection styles */
+::selection {
+  background: rgba(0, 217, 255, 0.3);
+  color: #ffffff;
+}
+
+/* Focus styles */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid rgba(0, 217, 255, 0.5);
+  outline-offset: 2px;
+}
