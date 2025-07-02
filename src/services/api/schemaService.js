@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'schema_flow_data'
+const STORAGE_KEY = 'schema_flow_data';
 const schemaService = {
   saveSchema: (schema) => {
     try {
@@ -77,17 +77,16 @@ const schemaService = {
     // Generate foreign key constraints
     if (schema.relationships && schema.relationships.length > 0) {
       sql += '-- Foreign Key Constraints\n'
-      schema.relationships.forEach(rel => {
+schema.relationships.forEach(rel => {
         sql += `ALTER TABLE ${rel.fromTable} ADD CONSTRAINT fk_${rel.fromTable}_${rel.fromColumn} `
         sql += `FOREIGN KEY (${rel.fromColumn}) REFERENCES ${rel.toTable}(${rel.toColumn});\n`
       })
       sql += '\n'
-sql += '\n'
     }
     
     return sql
-
-  // Relationship management
+  },
+// Relationship management
   createRelationship: (relationship) => {
     // This would typically validate the relationship
     return {
@@ -96,7 +95,6 @@ sql += '\n'
       createdAt: new Date().toISOString()
     }
   },
-
   validateSchema: (schema) => {
     const errors = []
     const warnings = []
@@ -153,13 +151,13 @@ sql += '\n'
     return arranged
   },
   
-  clearSchema: () => {
+clearSchema: () => {
     try {
       localStorage.removeItem(STORAGE_KEY)
       return true
     } catch (error) {
       console.error('Failed to clear schema:', error)
-throw new Error('Failed to clear schema from local storage')
+      throw new Error('Failed to clear schema from local storage')
     }
   }
 }
