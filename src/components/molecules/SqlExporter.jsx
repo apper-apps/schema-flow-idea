@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Button from '@/components/atoms/Button'
-import ApperIcon from '@/components/ApperIcon'
+import React, { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
 
 const SqlExporter = ({ schema, isOpen, onClose }) => {
   const [selectedDialect, setSelectedDialect] = useState('mysql')
-  
+  const [exportFormat, setExportFormat] = useState('sql')
+  const [includeComments, setIncludeComments] = useState(true)
+  const [includeDropStatements, setIncludeDropStatements] = useState(false)
   const generateSQL = () => {
     if (!schema || !schema.tables || schema.tables.length === 0) {
       return '-- No tables to export'
@@ -53,30 +55,89 @@ const SqlExporter = ({ schema, isOpen, onClose }) => {
     }
     
     return sql
-  }
+}
   
-  const copyToClipboard = async () => {
-    try {
-      await navigator.clipboard.writeText(generateSQL())
-      // Could add toast notification here
-    } catch (err) {
-      console.error('Failed to copy:', err)
-    }
-  }
-  
-  const downloadSQL = () => {
-    const sql = generateSQL()
-    const blob = new Blob([sql], { type: 'text/sql' })
+  const downloadFile = () => {
+    const content = getContent()
+    const extension = getFileExtension()
+    const mimeType = exportFormat === 'json' ? 'application/json' : 'text/plain'
+    
+    const blob = new Blob([content], { type: mimeType })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${schema?.name || 'schema'}.sql`
+    a.download = `${schema?.name || 'schema'}.${extension}`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
-  
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(getContent())
+      // Could add toast notification here
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
+  const generateJSON = () => {
+    return JSON.stringify(schema, null, 2)
+  }
+
+  const generateDocumentation = () => {
+    if (!schema || !schema.tables || schema.tables.length === 0) {
+      return '# No tables to document'
+    }
+
+    let doc = `# Database Schema Documentation\n\n`
+    doc += `**Schema Name:** ${schema.name || 'Untitled Schema'}\n`
+    doc += `**Generated on:** ${new Date().toLocaleString()}\n`
+    doc += `**Total Tables:** ${schema.tables.length}\n\n`
+
+    schema.tables.forEach(table => {
+      doc += `## Table: ${table.name}\n\n`
+      
+      if (table.columns && table.columns.length > 0) {
+        doc += `| Column | Type | Constraints | Description |\n`
+        doc += `|--------|------|-------------|-------------|\n`
+        
+        table.columns.forEach(column => {
+          const constraints = []
+          if (column.isPrimaryKey) constraints.push('PK')
+          if (column.isForeignKey) constraints.push('FK')
+          if (column.isNotNull) constraints.push('NOT NULL')
+          if (column.isUnique) constraints.push('UNIQUE')
+          if (column.isAutoIncrement) constraints.push('AUTO_INCREMENT')
+          
+          doc += `| ${column.name} | ${column.type} | ${constraints.join(', ') || '-'} | ${column.comment || '-'} |\n`
+        })
+        doc += `\n`
+      }
+    })
+
+    return doc
+  }
+
+  const getContent = () => {
+    switch (exportFormat) {
+      case 'json':
+        return generateJSON()
+      case 'documentation':
+        return generateDocumentation()
+      default:
+        return generateSQL()
+    }
+  }
+
+  const getFileExtension = () => {
+    switch (exportFormat) {
+      case 'json': return 'json'
+      case 'documentation': return 'md'
+      default: return 'sql'
+    }
+  }
   if (!isOpen) return null
   
   return (
@@ -102,35 +163,97 @@ const SqlExporter = ({ schema, isOpen, onClose }) => {
             <Button variant="ghost" icon="X" onClick={onClose} size="sm" />
           </div>
           
-          <div className="flex items-center gap-4 mb-6">
-            <label className="text-sm font-medium text-gray-300">Database Dialect:</label>
-            <select
-              value={selectedDialect}
-              onChange={(e) => setSelectedDialect(e.target.value)}
-              className="px-3 py-2 bg-background border border-white/20 rounded-lg text-white text-sm"
-            >
-              <option value="mysql">MySQL</option>
-              <option value="postgresql">PostgreSQL</option>
-              <option value="sqlite">SQLite</option>
-            </select>
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+              <label className="text-sm font-medium text-gray-300 mb-2 block">Export Format:</label>
+              <select
+                value={exportFormat}
+                onChange={(e) => setExportFormat(e.target.value)}
+                className="w-full px-3 py-2 bg-background border border-white/20 rounded-lg text-white text-sm"
+              >
+                <option value="sql">SQL Script</option>
+                <option value="json">JSON Schema</option>
+                <option value="documentation">Documentation</option>
+              </select>
+            </div>
+
+            {exportFormat === 'sql' && (
+              <div>
+                <label className="text-sm font-medium text-gray-300 mb-2 block">Database Dialect:</label>
+                <select
+                  value={selectedDialect}
+                  onChange={(e) => setSelectedDialect(e.target.value)}
+                  className="w-full px-3 py-2 bg-background border border-white/20 rounded-lg text-white text-sm"
+                >
+                  <option value="mysql">MySQL</option>
+                  <option value="postgresql">PostgreSQL</option>
+                  <option value="sqlite">SQLite</option>
+                  <option value="mssql">SQL Server</option>
+                  <option value="oracle">Oracle</option>
+                </select>
+              </div>
+            )}
+
+            <div>
+              <label className="text-sm font-medium text-gray-300 mb-2 block">Options:</label>
+              <div className="space-y-2">
+                {exportFormat === 'sql' && (
+                  <>
+                    <label className="flex items-center gap-2 text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={includeComments}
+                        onChange={(e) => setIncludeComments(e.target.checked)}
+                        className="rounded"
+                      />
+                      Include Comments
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={includeDropStatements}
+                        onChange={(e) => setIncludeDropStatements(e.target.checked)}
+                        className="rounded"
+                      />
+                      Include DROP statements
+                    </label>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
           
-          <div className="flex-1 min-h-0">
-            <pre className="bg-background border border-white/10 rounded-lg p-4 text-sm text-gray-300 font-mono overflow-auto h-full whitespace-pre-wrap">
-              {generateSQL()}
-            </pre>
+<div className="flex-1 min-h-0">
+            <div className="bg-background border border-white/10 rounded-lg overflow-hidden h-full">
+              <div className="bg-surface/50 px-4 py-2 border-b border-white/10 flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-300">
+                  {exportFormat === 'sql' && `${selectedDialect.toUpperCase()} Script`}
+                  {exportFormat === 'json' && 'JSON Schema'}
+                  {exportFormat === 'documentation' && 'Markdown Documentation'}
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">
+                    {getContent().split('\n').length} lines
+                  </span>
+                </div>
+              </div>
+              <pre className="p-4 text-sm text-gray-300 font-mono overflow-auto h-full whitespace-pre-wrap">
+                {getContent()}
+              </pre>
+            </div>
           </div>
           
-          <div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
+<div className="flex justify-between items-center mt-6 pt-6 border-t border-white/10">
             <div className="text-sm text-gray-400">
-              {schema?.tables?.length || 0} tables • Generated for {selectedDialect.toUpperCase()}
+              {schema?.tables?.length || 0} tables • {schema?.relationships?.length || 0} relationships
+              {exportFormat === 'sql' && ` • ${selectedDialect.toUpperCase()}`}
             </div>
             <div className="flex gap-3">
               <Button variant="ghost" icon="Copy" onClick={copyToClipboard}>
                 Copy to Clipboard
               </Button>
-              <Button variant="primary" icon="Download" onClick={downloadSQL}>
-                Download SQL File
+              <Button variant="primary" icon="Download" onClick={downloadFile}>
+                Download {exportFormat === 'sql' ? 'SQL' : exportFormat === 'json' ? 'JSON' : 'MD'} File
               </Button>
             </div>
           </div>

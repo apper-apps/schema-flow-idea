@@ -20,20 +20,35 @@ const TableEditor = ({ table, onSave, onClose, isOpen }) => {
     }
   }, [table])
   
-  const dataTypes = [
+const dataTypes = [
     { value: 'VARCHAR(255)', label: 'VARCHAR(255)' },
+    { value: 'VARCHAR(50)', label: 'VARCHAR(50)' },
+    { value: 'VARCHAR(1000)', label: 'VARCHAR(1000)' },
+    { value: 'CHAR(10)', label: 'CHAR(10)' },
+    { value: 'TEXT', label: 'TEXT' },
+    { value: 'LONGTEXT', label: 'LONGTEXT' },
     { value: 'INT', label: 'INT' },
     { value: 'BIGINT', label: 'BIGINT' },
+    { value: 'SMALLINT', label: 'SMALLINT' },
+    { value: 'TINYINT', label: 'TINYINT' },
     { value: 'DECIMAL(10,2)', label: 'DECIMAL(10,2)' },
+    { value: 'FLOAT', label: 'FLOAT' },
+    { value: 'DOUBLE', label: 'DOUBLE' },
     { value: 'BOOLEAN', label: 'BOOLEAN' },
     { value: 'DATE', label: 'DATE' },
     { value: 'DATETIME', label: 'DATETIME' },
     { value: 'TIMESTAMP', label: 'TIMESTAMP' },
-    { value: 'TEXT', label: 'TEXT' },
-    { value: 'JSON', label: 'JSON' }
+    { value: 'TIME', label: 'TIME' },
+    { value: 'YEAR', label: 'YEAR' },
+    { value: 'BINARY', label: 'BINARY' },
+    { value: 'VARBINARY', label: 'VARBINARY' },
+    { value: 'BLOB', label: 'BLOB' },
+    { value: 'JSON', label: 'JSON' },
+    { value: 'UUID', label: 'UUID' },
+    { value: 'ENUM', label: 'ENUM' }
   ]
   
-  const addColumn = () => {
+const addColumn = () => {
     const newColumn = {
       id: `col_${Date.now()}`,
       name: '',
@@ -41,7 +56,10 @@ const TableEditor = ({ table, onSave, onClose, isOpen }) => {
       isPrimaryKey: false,
       isForeignKey: false,
       isNotNull: false,
-      defaultValue: ''
+      isUnique: false,
+      isAutoIncrement: false,
+      defaultValue: '',
+      comment: ''
     }
     setColumns([...columns, newColumn])
   }
@@ -54,10 +72,38 @@ const TableEditor = ({ table, onSave, onClose, isOpen }) => {
     setColumns(columns.map(col => 
       col.id === columnId ? { ...col, [field]: value } : col
     ))
+}
+
+  const moveColumn = (fromIndex, toIndex) => {
+    const newColumns = [...columns]
+    const [movedColumn] = newColumns.splice(fromIndex, 1)
+    newColumns.splice(toIndex, 0, movedColumn)
+    setColumns(newColumns)
+  }
+
+  const validateTable = () => {
+    const errors = []
+    if (!tableName.trim()) errors.push('Table name is required')
+    if (columns.length === 0) errors.push('At least one column is required')
+    
+    const primaryKeys = columns.filter(col => col.isPrimaryKey)
+    if (primaryKeys.length === 0) errors.push('At least one primary key is recommended')
+    
+    const columnNames = columns.map(col => col.name.trim().toLowerCase())
+    const duplicates = columnNames.filter((name, index) => name && columnNames.indexOf(name) !== index)
+    if (duplicates.length > 0) errors.push('Duplicate column names found')
+    
+    return errors
   }
   
   const handleSave = () => {
     if (!tableName.trim()) return
+    
+    const validationErrors = validateTable()
+    if (validationErrors.length > 0) {
+      alert('Validation errors:\n' + validationErrors.join('\n'))
+      return
+    }
     
     const updatedTable = {
       ...table,
@@ -118,6 +164,33 @@ const TableEditor = ({ table, onSave, onClose, isOpen }) => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
+<div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <ApperIcon name="GripVertical" size={16} className="text-gray-500 cursor-grab" />
+                        <span className="text-sm font-medium text-gray-300">Column {index + 1}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {index > 0 && (
+                          <button
+                            onClick={() => moveColumn(index, index - 1)}
+                            className="p-1 hover:bg-white/10 rounded transition-colors"
+                            title="Move up"
+                          >
+                            <ApperIcon name="ChevronUp" size={14} className="text-gray-400" />
+                          </button>
+                        )}
+                        {index < columns.length - 1 && (
+                          <button
+                            onClick={() => moveColumn(index, index + 1)}
+                            className="p-1 hover:bg-white/10 rounded transition-colors"
+                            title="Move down"
+                          >
+                            <ApperIcon name="ChevronDown" size={14} className="text-gray-400" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                       <Input
                         label="Column Name"
@@ -140,8 +213,17 @@ const TableEditor = ({ table, onSave, onClose, isOpen }) => {
                         placeholder="Optional"
                       />
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <Input
+                        label="Comment"
+                        value={column.comment || ''}
+                        onChange={(e) => updateColumn(column.id, 'comment', e.target.value)}
+                        placeholder="Optional description"
+                      />
+                    </div>
                     
-                    <div className="flex items-center justify-between">
+<div className="flex items-center justify-between">
                       <div className="flex flex-wrap gap-4">
                         <Checkbox
                           label="Primary Key"
@@ -157,6 +239,16 @@ const TableEditor = ({ table, onSave, onClose, isOpen }) => {
                           label="Not Null"
                           checked={column.isNotNull}
                           onChange={(e) => updateColumn(column.id, 'isNotNull', e.target.checked)}
+                        />
+                        <Checkbox
+                          label="Unique"
+                          checked={column.isUnique}
+                          onChange={(e) => updateColumn(column.id, 'isUnique', e.target.checked)}
+                        />
+                        <Checkbox
+                          label="Auto Increment"
+                          checked={column.isAutoIncrement}
+                          onChange={(e) => updateColumn(column.id, 'isAutoIncrement', e.target.checked)}
                         />
                       </div>
                       

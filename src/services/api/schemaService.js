@@ -1,5 +1,4 @@
 const STORAGE_KEY = 'schema_flow_data'
-
 const schemaService = {
   saveSchema: (schema) => {
     try {
@@ -83,9 +82,75 @@ const schemaService = {
         sql += `FOREIGN KEY (${rel.fromColumn}) REFERENCES ${rel.toTable}(${rel.toColumn});\n`
       })
       sql += '\n'
+sql += '\n'
     }
     
     return sql
+
+  // Relationship management
+  createRelationship: (relationship) => {
+    // This would typically validate the relationship
+    return {
+      id: `rel_${Date.now()}`,
+      ...relationship,
+      createdAt: new Date().toISOString()
+    }
+  },
+
+  validateSchema: (schema) => {
+    const errors = []
+    const warnings = []
+
+    if (!schema.tables || schema.tables.length === 0) {
+      warnings.push('Schema has no tables')
+      return { errors, warnings }
+    }
+
+    // Check for tables without primary keys
+    schema.tables.forEach(table => {
+      const primaryKeys = table.columns?.filter(col => col.isPrimaryKey) || []
+      if (primaryKeys.length === 0) {
+        warnings.push(`Table '${table.name}' has no primary key`)
+      }
+    })
+
+    // Check for orphaned foreign keys
+    if (schema.relationships) {
+      schema.relationships.forEach(rel => {
+        const fromTable = schema.tables.find(t => t.name === rel.fromTable)
+        const toTable = schema.tables.find(t => t.name === rel.toTable)
+        
+        if (!fromTable) {
+          errors.push(`Relationship references non-existent table '${rel.fromTable}'`)
+        }
+        if (!toTable) {
+          errors.push(`Relationship references non-existent table '${rel.toTable}'`)
+        }
+      })
+    }
+
+    return { errors, warnings }
+  },
+
+  autoArrangeTables: (tables, algorithm = 'grid') => {
+    if (!tables || tables.length === 0) return tables
+
+    const arranged = [...tables]
+    
+    if (algorithm === 'grid') {
+      const columns = Math.ceil(Math.sqrt(tables.length))
+      const spacing = { x: 300, y: 200 }
+      const startPos = { x: 50, y: 50 }
+
+      arranged.forEach((table, index) => {
+        const row = Math.floor(index / columns)
+        const col = index % columns
+        table.x = startPos.x + (col * spacing.x)
+        table.y = startPos.y + (row * spacing.y)
+      })
+    }
+
+    return arranged
   },
   
   clearSchema: () => {
@@ -94,7 +159,7 @@ const schemaService = {
       return true
     } catch (error) {
       console.error('Failed to clear schema:', error)
-      throw new Error('Failed to clear schema from local storage')
+throw new Error('Failed to clear schema from local storage')
     }
   }
 }

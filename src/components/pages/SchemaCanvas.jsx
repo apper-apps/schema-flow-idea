@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useHotkeys } from 'react-hotkeys-hook'
 import { toast } from 'react-toastify'
 import Toolbar from '@/components/molecules/Toolbar'
 import Canvas from '@/components/organisms/Canvas'
@@ -16,13 +17,24 @@ const SchemaCanvas = () => {
     updatedAt: new Date()
   })
   
-  const [selectedTable, setSelectedTable] = useState(null)
+const [selectedTable, setSelectedTable] = useState(null)
   const [editingTable, setEditingTable] = useState(null)
   const [isTableEditorOpen, setIsTableEditorOpen] = useState(false)
   const [isSqlExporterOpen, setIsSqlExporterOpen] = useState(false)
   const [zoom, setZoom] = useState(100)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showMinimap, setShowMinimap] = useState(false)
+  const [snapToGrid, setSnapToGrid] = useState(false)
+
+  // Keyboard shortcuts
+  useHotkeys('ctrl+n', (e) => { e.preventDefault(); handleAddTable(); }, [])
+  useHotkeys('ctrl+s', (e) => { e.preventDefault(); handleSave(true); }, [])
+  useHotkeys('ctrl+e', (e) => { e.preventDefault(); handleExport(); }, [])
+  useHotkeys('ctrl+=', (e) => { e.preventDefault(); handleZoomIn(); }, [])
+  useHotkeys('ctrl+-', (e) => { e.preventDefault(); handleZoomOut(); }, [])
+  useHotkeys('ctrl+0', (e) => { e.preventDefault(); handleZoomReset(); }, [])
+  useHotkeys('delete', () => { selectedTable && handleTableDelete(selectedTable.id); }, [selectedTable])
   // Load schema on mount
   useEffect(() => {
     const loadSchema = () => {
@@ -118,8 +130,49 @@ const SchemaCanvas = () => {
     setEditingTable(null)
     setHasUnsavedChanges(true)
     toast.success(updatedTable.id ? 'Table updated successfully' : 'Table created successfully')
+}
+
+  const handleRelationshipCreate = (relationshipData) => {
+    setSchema(prev => ({
+      ...prev,
+      relationships: [...(prev.relationships || []), {
+        id: `rel_${Date.now()}`,
+        ...relationshipData,
+        createdAt: new Date()
+      }],
+      updatedAt: new Date()
+    }))
+    setHasUnsavedChanges(true)
+    toast.success('Relationship created successfully')
   }
-  
+
+  const handleAutoLayout = () => {
+    const layoutTables = [...schema.tables]
+    const columns = 4
+    const spacing = { x: 300, y: 200 }
+    const startPos = { x: 50, y: 50 }
+
+    layoutTables.forEach((table, index) => {
+      const row = Math.floor(index / columns)
+      const col = index % columns
+      table.x = startPos.x + (col * spacing.x)
+      table.y = startPos.y + (row * spacing.y)
+    })
+
+    setSchema(prev => ({
+      ...prev,
+      tables: layoutTables,
+      updatedAt: new Date()
+    }))
+    setHasUnsavedChanges(true)
+    toast.success('Tables arranged automatically')
+  }
+
+  const handleMinimapClick = (x, y) => {
+    // This would center the viewport on the clicked position
+    // Implementation would depend on Canvas component's pan state management
+    toast.info(`Navigate to position ${x}, ${y}`)
+  }
   const handleSave = (showToast = true) => {
     try {
       schemaService.saveSchema(schema)
@@ -184,7 +237,7 @@ const SchemaCanvas = () => {
   
   return (
     <div className="h-screen flex flex-col bg-background">
-      <Toolbar
+<Toolbar
         onAddTable={handleAddTable}
         onSave={() => handleSave(true)}
         onLoad={handleLoad}
@@ -193,18 +246,31 @@ const SchemaCanvas = () => {
         onZoomIn={handleZoomIn}
         onZoomOut={handleZoomOut}
         onZoomReset={handleZoomReset}
+        onSearch={setSearchTerm}
+        onToggleMinimap={() => setShowMinimap(!showMinimap)}
+        onToggleSnapToGrid={() => setSnapToGrid(!snapToGrid)}
+        onAutoLayout={handleAutoLayout}
+        searchTerm={searchTerm}
+        showMinimap={showMinimap}
+        snapToGrid={snapToGrid}
         zoom={zoom}
         hasUnsavedChanges={hasUnsavedChanges}
       />
       
-      <Canvas
+<Canvas
         tables={schema.tables}
+        relationships={schema.relationships || []}
         selectedTable={selectedTable}
         onTableMove={handleTableMove}
         onTableSelect={handleTableSelect}
         onTableEdit={handleTableEdit}
         onTableDelete={handleTableDelete}
+        onRelationshipCreate={handleRelationshipCreate}
         onAddTable={handleAddTable}
+        searchTerm={searchTerm}
+        showMinimap={showMinimap}
+        snapToGrid={snapToGrid}
+        onMinimapClick={handleMinimapClick}
         zoom={zoom}
       />
       
