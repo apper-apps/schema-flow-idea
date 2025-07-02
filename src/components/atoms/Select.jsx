@@ -17,14 +17,14 @@ const Select = forwardRef(({
         </label>
       )}
       <div className="relative">
-        <select
+<select
           ref={ref}
           className={`
-            w-full px-3 py-2.5 bg-surface border border-white/20 rounded-lg 
-            text-white appearance-none cursor-pointer
+            w-full px-3 py-2.5 sm:py-3 bg-surface border border-white/20 rounded-lg 
+            text-white appearance-none cursor-pointer text-sm sm:text-base
             focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 focus:glow-primary
             disabled:opacity-50 disabled:cursor-not-allowed
-            transition-all duration-200
+            transition-all duration-200 mobile-touch-target
             ${error ? 'border-error focus:border-error focus:ring-error/50' : ''}
             ${className}
           `}
@@ -41,8 +41,8 @@ const Select = forwardRef(({
             </option>
           ))}
         </select>
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-          <ApperIcon name="ChevronDown" size={16} className="text-gray-400" />
+<div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+          <ApperIcon name="ChevronDown" size={16} className="text-gray-400 transition-transform" />
         </div>
       </div>
       {error && (

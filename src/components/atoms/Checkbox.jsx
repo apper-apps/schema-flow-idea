@@ -9,7 +9,7 @@ const Checkbox = forwardRef(({
 }, ref) => {
   return (
     <div className="space-y-1">
-      <label className="flex items-center gap-3 cursor-pointer">
+<label className="flex items-center gap-3 cursor-pointer mobile-touch-target">
         <div className="relative">
           <input
             ref={ref}
@@ -18,9 +18,9 @@ const Checkbox = forwardRef(({
             {...props}
           />
           <div className={`
-            w-5 h-5 border-2 rounded-md transition-all duration-200
+            w-5 h-5 sm:w-6 sm:h-6 border-2 rounded-md transition-all duration-200
             ${props.checked 
-              ? 'bg-primary border-primary glow-primary' 
+              ? 'bg-primary border-primary glow-primary scale-105' 
               : 'border-white/30 hover:border-primary/50'
             }
             ${className}
@@ -34,8 +34,8 @@ const Checkbox = forwardRef(({
             )}
           </div>
         </div>
-        {label && (
-          <span className="text-sm text-gray-300 select-none">
+{label && (
+          <span className="text-sm sm:text-base text-gray-300 select-none">
             {label}
           </span>
         )}

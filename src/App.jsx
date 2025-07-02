@@ -5,7 +5,7 @@ import SchemaCanvas from '@/components/pages/SchemaCanvas'
 function App() {
   return (
     <BrowserRouter>
-      <div className="App min-h-screen bg-background text-white">
+      <div className="App min-h-screen bg-background text-white overflow-hidden">
         <SchemaCanvas />
         <ToastContainer
           position="top-right"

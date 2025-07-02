@@ -14,15 +14,15 @@ const Input = forwardRef(({
           {label}
         </label>
       )}
-      <input
+<input
         ref={ref}
         type={type}
         className={`
-          w-full px-3 py-2.5 bg-surface border border-white/20 rounded-lg 
-          text-white placeholder-gray-400 
+          w-full px-3 py-2.5 sm:py-3 bg-surface border border-white/20 rounded-lg 
+          text-white placeholder-gray-400 text-sm sm:text-base
           focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 focus:glow-primary
           disabled:opacity-50 disabled:cursor-not-allowed
-          transition-all duration-200
+          transition-all duration-200 mobile-touch-target
           ${error ? 'border-error focus:border-error focus:ring-error/50' : ''}
           ${className}
         `}

@@ -17,6 +17,30 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+  touch-action: manipulation;
+}
+
+/* Responsive typography */
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:bg-white\/10:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .hover\:scale-105:hover {
+    transform: scale(1.05);
+  }
 }
 
 /* Custom scrollbar */
@@ -39,10 +63,37 @@ body {
   background: rgba(0, 217, 255, 0.5);
 }
 
-/* Canvas grid pattern */
+/* Canvas grid pattern - responsive */
 .canvas-grid {
   background-image: radial-gradient(circle, rgba(0, 217, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+@media (max-width: 640px) {
+  .canvas-grid {
+    background-size: 15px 15px;
+  }
+}
+
+/* Responsive containers */
+.container-responsive {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
 }
 
 /* Neon glow utilities */
@@ -71,8 +122,17 @@ body {
 }
 
 /* Toast container overrides */
+/* Responsive toast container */
 .Toastify__toast-container {
   width: 320px;
+}
+
+@media (max-width: 640px) {
+  .Toastify__toast-container {
+    width: calc(100vw - 2rem);
+    left: 1rem !important;
+    right: 1rem !important;
+  }
 }
 
 .Toastify__toast {
@@ -84,6 +144,13 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 14px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 640px) {
+  .Toastify__toast {
+    font-size: 13px;
+    margin-bottom: 0.5rem;
+  }
 }
 
 .Toastify__toast--success {
@@ -116,4 +183,51 @@ body {
 *:focus-visible {
   outline: 2px solid rgba(0, 217, 255, 0.5);
   outline-offset: 2px;
+}
+
+/* Mobile-friendly animations */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Enhanced mobile interactions */
+@media (max-width: 768px) {
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .mobile-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+}
+
+/* Advanced glow effects with performance optimization */
+@supports (backdrop-filter: blur(10px)) {
+  .glass-advanced {
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(26, 26, 46, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+  }
+}
+
+/* Responsive utility classes */
+.text-responsive {
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.spacing-responsive {
+  padding: clamp(0.5rem, 3vw, 1.5rem);
+}
+
+.radius-responsive {
+  border-radius: clamp(0.375rem, 1vw, 0.75rem);
 }

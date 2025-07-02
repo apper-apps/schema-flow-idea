@@ -1,6 +1,6 @@
-import { useState, useRef } from 'react'
-import { motion } from 'framer-motion'
-import ApperIcon from '@/components/ApperIcon'
+import React, { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
 
 const DatabaseTable = ({ 
   table, 
@@ -87,23 +87,26 @@ const handleMouseMove = (e) => {
     rel.fromTable === table.name || rel.toTable === table.name
   ).length
 
-  return (
+return (
     <>
       <motion.div
         ref={tableRef}
         className={`
-          absolute bg-surface border-2 rounded-lg shadow-lg cursor-move select-none min-w-[250px] max-w-[320px]
+          absolute bg-surface border-2 rounded-lg shadow-lg select-none 
+          min-w-[250px] max-w-[320px] sm:min-w-[280px] sm:max-w-[350px]
+          mobile-touch-target
           ${isSelected 
             ? 'border-primary glow-primary z-20' 
             : 'border-white/20 hover:border-primary/50 hover:glow-primary z-10'
           }
-          ${isDragging ? 'cursor-grabbing z-30' : 'cursor-grab'}
+          ${isDragging ? 'cursor-grabbing z-30 scale-105 sm:scale-102' : 'cursor-grab hover:scale-101'}
           ${isHovering ? 'shadow-2xl' : ''}
+          transition-transform duration-200 ease-out
         `}
-        style={{
+style={{
           left: position.x,
           top: position.y,
-          transform: isDragging ? 'scale(1.02)' : 'scale(1)'
+          transform: isDragging ? 'scale(1.05)' : 'scale(1)'
         }}
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
@@ -122,12 +125,12 @@ const handleMouseMove = (e) => {
              title="Connect relationships" />
         <div className="absolute top-1/2 -left-2 w-4 h-4 bg-primary rounded-full border-2 border-background transform -translate-y-1/2 opacity-0 hover:opacity-100 transition-opacity cursor-crosshair" 
              title="Connect relationships" />
-      {/* Table Header */}
-      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-3 rounded-t-md border-b border-white/10">
+{/* Table Header */}
+      <div className="bg-gradient-to-r from-primary/20 to-secondary/20 p-3 sm:p-4 rounded-t-md border-b border-white/10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ApperIcon name="Table" size={18} className="text-primary" />
-            <h3 className="font-display font-semibold text-white">{table.name}</h3>
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <ApperIcon name="Table" size={18} className="text-primary flex-shrink-0" />
+            <h3 className="font-display font-semibold text-white truncate text-sm sm:text-base">{table.name}</h3>
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -148,14 +151,14 @@ const handleMouseMove = (e) => {
         </div>
       </div>
       
-      {/* Columns */}
-      <div className="p-3">
+{/* Columns */}
+      <div className="p-3 sm:p-4">
         {table.columns && table.columns.length > 0 ? (
-          <div className="space-y-2">
+          <div className="space-y-1 sm:space-y-2">
 {table.columns.map(column => (
               <div 
                 key={column.id} 
-                className="flex items-center justify-between text-sm py-2 px-2 rounded hover:bg-white/5 group transition-all"
+                className="flex items-center justify-between text-xs sm:text-sm py-2 px-2 rounded hover:bg-white/5 group transition-all mobile-touch-target"
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <div className="flex items-center gap-1 flex-shrink-0">
@@ -198,10 +201,10 @@ const handleMouseMove = (e) => {
       </div>
       
 {/* Stats Footer */}
-        <div className="px-3 py-2 bg-black/20 rounded-b-md border-t border-white/10">
+        <div className="px-3 py-2 sm:px-4 bg-black/20 rounded-b-md border-t border-white/10">
           <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>{table.columns?.length || 0} columns</span>
-            <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm">{table.columns?.length || 0} columns</span>
+            <div className="flex items-center gap-1 sm:gap-2">
               {primaryKeys.length > 0 && (
                 <span className="flex items-center gap-1" title="Primary Keys">
                   <ApperIcon name="Key" size={10} className="text-accent" />
@@ -225,13 +228,13 @@ const handleMouseMove = (e) => {
         </div>
       </motion.div>
 
-      {/* Context Menu */}
+{/* Context Menu */}
       {showContextMenu && (
         <motion.div
-          className="fixed bg-surface border border-white/20 rounded-lg shadow-lg z-50 py-2 min-w-[160px] glass"
+          className="fixed bg-surface border border-white/20 rounded-lg shadow-lg z-50 py-2 min-w-[160px] sm:min-w-[180px] glass-advanced"
           style={{
-            left: position.x + 100,
-            top: position.y + 50
+            left: Math.min(position.x + 100, window.innerWidth - 200),
+            top: Math.min(position.y + 50, window.innerHeight - 150)
           }}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}

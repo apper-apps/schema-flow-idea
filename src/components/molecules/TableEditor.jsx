@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Button from '@/components/atoms/Button'
-import Input from '@/components/atoms/Input'
-import Select from '@/components/atoms/Select'
-import Checkbox from '@/components/atoms/Checkbox'
-import ApperIcon from '@/components/ApperIcon'
+import React, { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
+import Select from "@/components/atoms/Select";
+import Checkbox from "@/components/atoms/Checkbox";
+import Input from "@/components/atoms/Input";
+import Button from "@/components/atoms/Button";
 
 const TableEditor = ({ table, onSave, onClose, isOpen }) => {
   const [tableName, setTableName] = useState('')
@@ -116,27 +116,27 @@ const addColumn = () => {
   
   if (!isOpen) return null
   
-  return (
+return (
     <AnimatePresence>
       <motion.div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-2 sm:p-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       >
         <motion.div
-          className="bg-surface border border-white/20 rounded-xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto glass glow-primary"
+          className="bg-surface border border-white/20 rounded-xl p-4 sm:p-6 max-w-5xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto glass-advanced glow-primary mobile-scroll"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           onClick={e => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-display font-semibold text-white">
-              {table ? `Edit Table: ${table.name}` : 'Create New Table'}
+<div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-2xl font-display font-semibold text-white truncate pr-4">
+              {table ? `Edit: ${table.name}` : 'Create New Table'}
             </h2>
-            <Button variant="ghost" icon="X" onClick={onClose} size="sm" />
+            <Button variant="ghost" icon="X" onClick={onClose} size="sm" className="flex-shrink-0" />
           </div>
           
           <div className="space-y-6">
@@ -147,10 +147,10 @@ const addColumn = () => {
               placeholder="Enter table name"
             />
             
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-white">Columns</h3>
-                <Button variant="accent" icon="Plus" onClick={addColumn} size="sm">
+<div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <h3 className="text-base sm:text-lg font-medium text-white">Columns</h3>
+                <Button variant="accent" icon="Plus" onClick={addColumn} size="sm" className="w-full sm:w-auto">
                   Add Column
                 </Button>
               </div>
@@ -191,7 +191,7 @@ const addColumn = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4">
                       <Input
                         label="Column Name"
                         value={column.name}
@@ -206,15 +206,17 @@ const addColumn = () => {
                         options={dataTypes}
                       />
                       
-                      <Input
-                        label="Default Value"
-                        value={column.defaultValue}
-                        onChange={(e) => updateColumn(column.id, 'defaultValue', e.target.value)}
-                        placeholder="Optional"
-                      />
+                      <div className="sm:col-span-2 lg:col-span-1">
+                        <Input
+                          label="Default Value"
+                          value={column.defaultValue}
+                          onChange={(e) => updateColumn(column.id, 'defaultValue', e.target.value)}
+                          placeholder="Optional"
+                        />
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+<div className="mb-4">
                       <Input
                         label="Comment"
                         value={column.comment || ''}
@@ -223,8 +225,7 @@ const addColumn = () => {
                       />
                     </div>
                     
-<div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-4">
+<div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                         <Checkbox
                           label="Primary Key"
                           checked={column.isPrimaryKey}
@@ -250,7 +251,7 @@ const addColumn = () => {
                           checked={column.isAutoIncrement}
                           onChange={(e) => updateColumn(column.id, 'isAutoIncrement', e.target.checked)}
                         />
-                      </div>
+</div>
                       
                       <Button 
                         variant="ghost" 
@@ -273,11 +274,11 @@ const addColumn = () => {
             </div>
           </div>
           
-          <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-white/10">
-            <Button variant="ghost" onClick={onClose}>
+<div className="flex flex-col sm:flex-row justify-end gap-3 mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10">
+            <Button variant="ghost" onClick={onClose} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleSave} disabled={!tableName.trim()}>
+            <Button variant="primary" onClick={handleSave} disabled={!tableName.trim()} className="w-full sm:w-auto">
               {table ? 'Update Table' : 'Create Table'}
             </Button>
           </div>

@@ -160,11 +160,13 @@ const handleCanvasClick = (e) => {
 return (
     <div 
       ref={canvasRef}
-      className={`flex-1 overflow-hidden bg-background relative ${snapToGrid ? 'canvas-grid' : ''}`}
+      className={`flex-1 overflow-hidden bg-background relative mobile-scroll ${snapToGrid ? 'canvas-grid' : ''}`}
       onMouseDown={handleMouseDown}
       onClick={handleCanvasClick}
+      onTouchStart={handleMouseDown}
       style={{
-        cursor: isDragging ? 'grabbing' : (isCreatingRelationship ? 'crosshair' : 'grab')
+        cursor: isDragging ? 'grabbing' : (isCreatingRelationship ? 'crosshair' : 'grab'),
+        touchAction: 'none'
       }}
     >
       {/* SVG for relationship lines */}
@@ -225,12 +227,12 @@ return (
         )}
       </motion.div>
 
-      {/* Minimap */}
+{/* Minimap */}
       {showMinimap && tables.length > 0 && (
-        <div className="absolute bottom-4 right-4 w-48 h-32 bg-surface/90 border border-white/20 rounded-lg backdrop-blur-sm z-30">
+        <div className="absolute bottom-4 right-4 w-40 h-28 sm:w-48 sm:h-32 bg-surface/90 border border-white/20 rounded-lg backdrop-blur-sm z-30 glass-advanced">
           <div className="p-2">
-            <div className="text-xs text-gray-400 mb-2 font-medium">Minimap</div>
-            <div className="relative w-full h-24 bg-background/50 rounded border border-white/10 overflow-hidden">
+            <div className="text-xs text-gray-400 mb-1 sm:mb-2 font-medium">Minimap</div>
+            <div className="relative w-full h-20 sm:h-24 bg-background/50 rounded border border-white/10 overflow-hidden">
               {tables.map(table => {
                 const scale = 0.1 // Scale down factor
                 const miniX = (table.x || 0) * scale
@@ -269,12 +271,12 @@ return (
         </div>
       )}
 
-      {/* Relationship creation indicator */}
+{/* Relationship creation indicator */}
       {isCreatingRelationship && (
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-primary/20 border border-primary rounded-lg px-4 py-2 z-40 glass">
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-primary/20 border border-primary rounded-lg px-3 py-2 sm:px-4 z-40 glass-advanced max-w-[90vw]">
           <div className="flex items-center gap-2 text-primary">
-<ApperIcon name="Link" size={16} />
-            <span className="text-sm font-medium">Click on target column to create relationship</span>
+<ApperIcon name="Link" size={16} className="flex-shrink-0" />
+            <span className="text-xs sm:text-sm font-medium">Click target column to create relationship</span>
           </div>
         </div>
       )}
