@@ -241,7 +241,7 @@ return (
                           checked={column.isNotNull}
                           onChange={(e) => updateColumn(column.id, 'isNotNull', e.target.checked)}
                         />
-                        <Checkbox
+<Checkbox
                           label="Unique"
                           checked={column.isUnique}
                           onChange={(e) => updateColumn(column.id, 'isUnique', e.target.checked)}
@@ -251,7 +251,7 @@ return (
                           checked={column.isAutoIncrement}
                           onChange={(e) => updateColumn(column.id, 'isAutoIncrement', e.target.checked)}
                         />
-</div>
+                    </div>
                       
                       <Button 
                         variant="ghost" 
@@ -262,7 +262,6 @@ return (
                       />
                     </div>
                   </motion.div>
-                ))}
                 
                 {columns.length === 0 && (
                   <div className="text-center py-8 text-gray-400">
