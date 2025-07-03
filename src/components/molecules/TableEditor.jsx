@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ApperIcon from "@/components/ApperIcon";
 import Select from "@/components/atoms/Select";
-import Checkbox from "@/components/atoms/Checkbox";
-import Input from "@/components/atoms/Input";
 import Button from "@/components/atoms/Button";
+import Input from "@/components/atoms/Input";
+import Checkbox from "@/components/atoms/Checkbox";
 
 const TableEditor = ({ table, onSave, onClose, isOpen }) => {
   const [tableName, setTableName] = useState('')
@@ -252,8 +252,7 @@ return (
                           onChange={(e) => updateColumn(column.id, 'isAutoIncrement', e.target.checked)}
                         />
                     </div>
-                      
-                      <Button 
+<Button 
                         variant="ghost" 
                         icon="Trash2" 
                         onClick={() => removeColumn(column.id)}
@@ -262,7 +261,7 @@ return (
                       />
                     </div>
                   </motion.div>
-                
+                ))}
                 {columns.length === 0 && (
                   <div className="text-center py-8 text-gray-400">
                     <ApperIcon name="Columns" size={48} className="mx-auto mb-4 opacity-50" />
